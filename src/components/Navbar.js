@@ -1,108 +1,59 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
 
 function Navbar() {
-  const { currentUser, logout } = useAuth();
   const location = useLocation();
 
-  const isActive = (path) => (location.pathname === path ? 'active' : '');
-
-  const handleLogout = () => {
-    logout();
-    sessionStorage.removeItem('isLoggedIn');
-  };
+  const isActive = (path) => location.pathname === path;
+  const linkStyle = (path) =>
+    `px-3 py-2 rounded-md text-sm font-medium cursor-pointer ${
+      isActive(path)
+        ? "bg-yellow-400 text-black"
+        : "text-white hover:bg-indigo-500 hover:text-white"
+    }`;
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark navbar-custom">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/dashboard">
-          <i className="fas fa-phone me-2"></i>
-          AI Calling Agent
-        </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <Link className={`nav-link ${isActive('/dashboard')}`} to="/dashboard">
-                <i className="fas fa-tachometer-alt me-1"></i>
-                Dashboard
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className={`nav-link ${isActive('/upload')}`} to="/upload">
-                <i className="fas fa-upload me-1"></i>
-                File Upload
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className={`nav-link ${isActive('/calls')}`} to="/calls">
-                <i className="fas fa-phone me-1"></i>
-                Call Management
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className={`nav-link ${isActive('/analytics')}`} to="/analytics">
-                <i className="fas fa-chart-bar me-1"></i>
-                Analytics
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className={`nav-link ${isActive('/settings')}`} to="/settings">
-                <i className="fas fa-cog me-1"></i>
-                Settings
-              </Link>
-            </li>
-            {/* AI Reminder (Test) external link */}
-            <li className="nav-item">
-              <a
-                className="nav-link"
-                href="https://ceg-uat-01.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="fas fa-bell me-1"></i>
-                AI Reminder (Test)
-              </a>
-            </li>
-          </ul>
-          <ul className="navbar-nav">
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                <i className="fas fa-user me-1"></i>
-                {currentUser?.name || 'User'}
-              </a>
-              <ul className="dropdown-menu">
-                <li>
-                  <span className="dropdown-item-text">{currentUser?.email}</span>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <button className="dropdown-item" onClick={handleLogout}>
-                    <i className="fas fa-sign-out-alt me-1"></i>
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
+    <nav className="bg-indigo-600 flex items-center justify-between p-4 shadow-md">
+      <div className="text-white text-2xl font-bold">AI Calling Agent</div>
+      <ul className="flex space-x-4">
+        <li>
+          <Link to="/" className={linkStyle("/")}>
+            Dashboard
+          </Link>
+        </li>
+        <li>
+          <Link to="/analytics" className={linkStyle("/analytics")}>
+            Analytics
+          </Link>
+        </li>
+        <li>
+          <Link to="/call-management" className={linkStyle("/call-management")}>
+            Call Management
+          </Link>
+        </li>
+        <li>
+          <Link to="/file-upload" className={linkStyle("/file-upload")}>
+            File Upload
+          </Link>
+        </li>
+        <li>
+          <Link to="/settings" className={linkStyle("/settings")}>
+            Settings
+          </Link>
+        </li>
+
+        {/* 🔹 External redirect instead of internal route */}
+        <li>
+          <a
+            href="https://ceg-uat-01.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-500 hover:text-white"
+          >
+            EMI Reminder
+          </a>
+        </li>
+      </ul>
     </nav>
   );
 }
