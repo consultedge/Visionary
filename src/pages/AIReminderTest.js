@@ -1,9 +1,9 @@
+// src/pages/AIReminderTest.js
+
 import React, { useEffect } from 'react';
 
-const AIReminderTest: React.FC = () => {
-  // On mount, load the login page or client form depending on sessionStorage
+const AIReminderTest = () => {
   useEffect(() => {
-    // Redirect React location to the static html
     window.location.replace('/ai-reminder-test/index.html');
   }, []);
 
