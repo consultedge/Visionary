@@ -5,15 +5,12 @@ import { useAuth } from '../contexts/AuthContext';
 function Navbar() {
   const { currentUser, logout } = useAuth();
   const location = useLocation();
-
   const isActive = (path) => {
     return location.pathname === path ? 'active' : '';
   };
-
   const handleLogout = () => {
     logout();
   };
-
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
@@ -22,10 +19,10 @@ function Navbar() {
           AI Calling Agent
         </Link>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
+        <button 
+          className="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
           data-bs-target="#navbarNav"
         >
           <span className="navbar-toggler-icon"></span>
@@ -64,7 +61,7 @@ function Navbar() {
               </Link>
             </li>
 
-            {/* 🔹 EMI Reminder External Redirect */}
+            {/* AI Reminder External Link */}
             <li className="nav-item">
               <a
                 className="nav-link"
@@ -73,18 +70,18 @@ function Navbar() {
                 rel="noopener noreferrer"
               >
                 <i className="fas fa-bell me-1"></i>
-                EMI Reminder
+                AI Reminder
               </a>
             </li>
           </ul>
 
           <ul className="navbar-nav">
             <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                href="#"
-                id="navbarDropdown"
-                role="button"
+              <a 
+                className="nav-link dropdown-toggle" 
+                href="#" 
+                id="navbarDropdown" 
+                role="button" 
                 data-bs-toggle="dropdown"
               >
                 <i className="fas fa-user me-1"></i>
@@ -111,5 +108,4 @@ function Navbar() {
     </nav>
   );
 }
-
 export default Navbar;
