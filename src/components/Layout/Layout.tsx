@@ -1,3 +1,5 @@
+// src/components/Layout/Layout.tsx
+
 import React, { useState } from 'react';
 import {
   AppBar,
@@ -25,6 +27,8 @@ import {
   Analytics,
   Upload,
   Settings,
+  // you can choose a distinct icon for AI Reminder (Test)
+  Replay as ReminderIcon,
   AccountCircle,
   Logout,
 } from '@mui/icons-material';
@@ -68,46 +72,46 @@ const Layout: React.FC<LayoutProps> = ({ children, user, signOut }) => {
     { text: 'Analytics', icon: <Analytics />, path: '/analytics' },
     { text: 'File Upload', icon: <Upload />, path: '/upload' },
     { text: 'Settings', icon: <Settings />, path: '/settings' },
+    // NEW TAB
+    { text: 'AI Reminder (Test)', icon: <ReminderIcon />, path: '/ai-reminder-test' },
   ];
 
   const drawer = (
-    <div>
-      <Toolbar>
-        <Typography variant="h6" noWrap component="div">
-          AI Calling Agent
-        </Typography>
-      </Toolbar>
+    <Box sx={{ textAlign: 'center' }}>
+      <Typography variant="h6" sx={{ my: 2 }}>
+        AI Calling Agent
+      </Typography>
       <Divider />
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton
               selected={location.pathname === item.path}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                navigate(item.path);
+                setMobileOpen(false);
+              }}
             >
-              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemIcon>
+                {item.icon}
+              </ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
-    </div>
+    </Box>
   );
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-        }}
-      >
+
+      {/* Top App Bar */}
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { sm: 'none' } }}
@@ -115,57 +119,36 @@ const Layout: React.FC<LayoutProps> = ({ children, user, signOut }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
+            {menuItems.find((item) => item.path === location.pathname)?.text || 'Dashboard'}
           </Typography>
-          <div>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <Avatar sx={{ width: 32, height: 32 }}>
-                {user?.attributes?.given_name?.[0] || user?.username?.[0] || 'U'}
-              </Avatar>
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <AccountCircle fontSize="small" />
-                </ListItemIcon>
-                Profile
-              </MenuItem>
-              <MenuItem onClick={handleSignOut}>
-                <ListItemIcon>
-                  <Logout fontSize="small" />
-                </ListItemIcon>
-                Sign Out
-              </MenuItem>
-            </Menu>
-          </div>
+          <IconButton color="inherit" onClick={handleMenu}>
+            <AccountCircle />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem disabled>
+              {user?.attributes?.given_name || user?.username || 'User'}
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleSignOut}>
+              <ListItemIcon>
+                <Logout fontSize="small" />
+              </ListItemIcon>
+              Sign Out
+            </MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
+
+      {/* Sidebar Drawer */}
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="mailbox folders"
       >
+        {/* Mobile Drawer */}
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -180,6 +163,7 @@ const Layout: React.FC<LayoutProps> = ({ children, user, signOut }) => {
         >
           {drawer}
         </Drawer>
+        {/* Desktop Drawer */}
         <Drawer
           variant="permanent"
           sx={{
@@ -191,17 +175,17 @@ const Layout: React.FC<LayoutProps> = ({ children, user, signOut }) => {
           {drawer}
         </Drawer>
       </Box>
+
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          minHeight: '100vh',
-          backgroundColor: 'background.default',
+          mt: 8,
         }}
       >
-        <Toolbar />
         {children}
       </Box>
     </Box>
