@@ -15,10 +15,10 @@ function Navbar() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav className="navbar navbar-expand-lg navbar-dark navbar-custom">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
-          <i className="fas fa-phone-alt me-2"></i>
+        <Link className="navbar-brand" to="/dashboard">
+          <i className="fas fa-phone me-2"></i>
           AI Calling Agent
         </Link>
         
@@ -34,33 +34,58 @@ function Navbar() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
-              <Link className={`nav-link ${isActive('/dashboard')}`} to="/dashboard">
+              <Link 
+                className={`nav-link ${isActive('/dashboard')}`} 
+                to="/dashboard"
+              >
                 <i className="fas fa-tachometer-alt me-1"></i>
                 Dashboard
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={`nav-link ${isActive('/upload')}`} to="/upload">
+              <Link 
+                className={`nav-link ${isActive('/upload')}`} 
+                to="/upload"
+              >
                 <i className="fas fa-upload me-1"></i>
                 File Upload
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={`nav-link ${isActive('/calls')}`} to="/calls">
+              <Link 
+                className={`nav-link ${isActive('/calls')}`} 
+                to="/calls"
+              >
                 <i className="fas fa-phone me-1"></i>
                 Call Management
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={`nav-link ${isActive('/analytics')}`} to="/analytics">
+              <Link 
+                className={`nav-link ${isActive('/analytics')}`} 
+                to="/analytics"
+              >
                 <i className="fas fa-chart-bar me-1"></i>
                 Analytics
               </Link>
             </li>
             <li className="nav-item">
-              <Link className={`nav-link ${isActive('/settings')}`} to="/settings">
+              <Link 
+                className={`nav-link ${isActive('/settings')}`} 
+                to="/settings"
+              >
                 <i className="fas fa-cog me-1"></i>
                 Settings
+              </Link>
+            </li>
+            {/* NEW: AI Reminder (Test) */}
+            <li className="nav-item">
+              <Link 
+                className={`nav-link ${isActive('/ai-reminder-test')}`} 
+                to="/ai-reminder-test"
+              >
+                <i className="fas fa-bell me-1"></i>
+                AI Reminder (Test)
               </Link>
             </li>
           </ul>
@@ -78,11 +103,7 @@ function Navbar() {
                 {currentUser?.name || 'User'}
               </a>
               <ul className="dropdown-menu">
-                <li>
-                  <span className="dropdown-item-text">
-                    <small className="text-muted">{currentUser?.email}</small>
-                  </span>
-                </li>
+                <li><span className="dropdown-item-text">{currentUser?.email}</span></li>
                 <li><hr className="dropdown-divider" /></li>
                 <li>
                   <button className="dropdown-item" onClick={handleLogout}>
