@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './AiReminder.css';
+import './AiReminder.css'; // See styles below
 
 function AiReminder() {
   // Form state
@@ -9,28 +9,28 @@ function AiReminder() {
   const [emiAmount, setEmiAmount] = useState('');
   const [dueDate, setDueDate] = useState('');
 
-  // Audio and speech state
+  // Speech-related state
   const recognitionRef = useRef(null);
   const synthesisRef = useRef(window.speechSynthesis);
   const [isListening, setIsListening] = useState(false);
   const [statusText, setStatusText] = useState('Idle');
   const [conversationLog, setConversationLog] = useState([]);
   const [processing, setProcessing] = useState(false);
-  const clientDataRef = useRef(null);
   const speechTimeoutRef = useRef(null);
   const currentTranscriptRef = useRef('');
+  const clientDataRef = useRef(null);
 
   useEffect(() => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert('Speech recognition not supported');
+      alert('Speech recognition unsupported in this browser.');
       return;
     }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = 'en-IN';
-    recognition.maxAlternatives = 1;
+    recognition.lang = 'en-IN'; // Set locale
 
     recognition.onstart = () => {
       setStatusText('Listening...');
@@ -38,12 +38,16 @@ function AiReminder() {
     };
 
     recognition.onerror = (event) => {
-      setStatusText(`Error: ${event.error}`);
-      if (event.error === 'not-allowed') stopListening();
+      if (event.error === 'not-allowed') {
+        setStatusText('Microphone access denied.');
+        stopListening();
+      } else {
+        setStatusText(`Speech recognition error: ${event.error}`);
+      }
     };
 
     recognition.onend = () => {
-      setStatusText('Stopped');
+      setStatusText('Stopped speaking');
       setIsListening(false);
       if (!processing && clientDataRef.current) setTimeout(() => startListening(), 500);
     };
@@ -86,7 +90,7 @@ function AiReminder() {
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
       navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
+        .then((stream) => {
           stream.getTracks().forEach(track => track.stop());
           recognitionRef.current.start();
           setIsListening(true);
@@ -100,7 +104,7 @@ function AiReminder() {
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
-      setStatusText('Stopped.');
+      setStatusText('Stopped');
     }
   };
 
@@ -108,41 +112,41 @@ function AiReminder() {
     setConversationLog(log => [...log, { sender, message, time: new Date().toLocaleTimeString() }]);
   };
 
-  const processSpeech = async (transcript) => {
+  const processSpeech = async (input) => {
     if (processing) return;
     setProcessing(true);
-    addMessage('user', transcript);
+    addMessage('user', input);
     currentTranscriptRef.current = '';
 
     try {
-      // Placeholder for invoking backend API, fallback local response below
-      const botReply = generateResponse(transcript.toLowerCase(), clientDataRef.current);
-      addMessage('ai', botReply);
-      speakText(botReply);
+      // For testing, respond locally
+      const response = generateResponse(input.toLowerCase());
+      addMessage('ai', response);
+      speakText(response);
     } catch {
-      const fallback = "Sorry, couldn't understand. Please repeat.";
-      addMessage('ai', fallback);
-      speakText(fallback);
+      addMessage('ai', 'Sorry, I did not catch that.');
+      speakText('Sorry, I did not catch that.');
     } finally {
       setProcessing(false);
     }
   };
 
-  const generateResponse = (input, clientData) => {
-    if (!clientData) return "Please submit client information first.";
+  const generateResponse = (input) => {
+    const data = clientDataRef.current;
+    if (!data) return 'Please submit client details first.';
     if (input.includes('paid') || input.includes('payment')) {
-      return `Thank you for confirming your payment, ${clientData.name}.`;
+      return `Thanks for the payment update, ${data.name}.`;
     }
-    if (input.includes('balance') || input.includes('due')) {
-      return `Your total due amount is ₹${clientData.totalDue}.`;
+    if (input.includes('balance') || input.includes('due amount')) {
+      return `Your outstanding amount is ₹${data.totalDue}.`;
     }
     if (input.includes('emi')) {
-      return `Your EMI amount is ₹${clientData.emiAmount}.`;
+      return `Your EMI amount is ₹${data.emiAmount}.`;
     }
-    if (input.includes('bye')) {
-      return `Thank you, ${clientData.name}. Have a good day!`;
+    if (input.includes('bye') || input.includes('thank you')) {
+      return `Thank you, ${data.name}. Have a nice day!`;
     }
-    return `Hello, ${clientData.name}. Please ask any questions about your loan or payments.`;
+    return `Hello ${data.name}, how can I assist you with your EMI today?`;
   };
 
   const speakText = (text) => {
@@ -157,7 +161,6 @@ function AiReminder() {
       setStatusText('Listening...');
       startListening();
     };
-
     window.speechSynthesis.speak(utterance);
   };
 
@@ -167,24 +170,23 @@ function AiReminder() {
     clientDataRef.current = data;
     addMessage('system', `Client data saved for ${clientName}`);
 
-    const greet = generateGreeting(data);
-    addMessage('ai', greet);
-    speakText(greet);
+    const greeting = generateGreeting(data);
+    addMessage('ai', greeting);
+    speakText(greeting);
   };
 
   const generateGreeting = (data) => {
-    if (!data) return "Hello! Please enter client details.";
-    const daysLeft = Math.ceil((new Date(data.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
-    if (daysLeft >= 0) {
-      return `Hello ${data.name}, your EMI of ₹${data.emiAmount} is due in ${daysLeft} days on ${new Date(data.dueDate).toLocaleDateString()}. Your total due is ₹${data.totalDue}. How can I assist you?`;
+    const days = Math.ceil((new Date(data.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+    if (days >= 0) {
+      return `Hi ${data.name}, your EMI of ₹${data.emiAmount} is due in ${days} days on ${new Date(data.dueDate).toLocaleDateString()}. Outstanding amount is ₹${data.totalDue}.`;
     } else {
-      return `Hello ${data.name}, your EMI of ₹${data.emiAmount} was due ${-daysLeft} days ago. Your total due is ₹${data.totalDue}. How can I assist you?`;
+      return `Hi ${data.name}, your EMI of ₹${data.emiAmount} was due ${-days} days ago. Outstanding amount is ₹${data.totalDue}.`;
     }
   };
 
   return (
     <div className="container">
-      <form className="client-form" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="client-form">
         <h1>Client Information</h1>
         <p>Enter client details for EMI reminder call</p>
 
@@ -203,7 +205,7 @@ function AiReminder() {
         <label>Due Date:</label>
         <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} required />
 
-        <button className="btn-primary" type="submit">Start AI Call</button>
+        <button type="submit" className="btn-primary">Start AI Call</button>
       </form>
 
       <div className="audio-interface">
@@ -211,11 +213,9 @@ function AiReminder() {
           <button onClick={startListening} disabled={isListening}>Start Listening</button>
           <button onClick={stopListening} disabled={!isListening}>Stop Listening</button>
         </div>
-
         <div className="status-indicator">
           <span>{statusText}</span>
         </div>
-
         <div className="conversation-log">
           {conversationLog.map((msg, idx) => (
             <div key={idx} className={`message ${msg.sender}`}>
