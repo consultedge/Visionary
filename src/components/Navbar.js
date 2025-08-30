@@ -62,7 +62,7 @@ function Navbar() {
             </li>
             {/* NEW: AI Reminder (Test) */}
             <li className="nav-item">
-              <a className="nav-link" href="/ai-reminder-test/index.html" target="_self">
+              <a className="nav-link" href="/ai-reminder-test/" target="_self" rel="noopener noreferrer">
                 <i className="fas fa-bell me-1"></i>
                 AI Reminder (Test)
               </a>
